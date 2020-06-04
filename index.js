@@ -1,9 +1,9 @@
 const fs = require("fs");
-const path = require("path");
+const axios = require("axios");
 const inquirer = require("inquirer");
 const generateMarkdown = require("./utils/generateMarkdown");
 
-const questions = [
+inquirer.prompt ([
   {
     type: "input",
     name: "github",
@@ -13,11 +13,6 @@ const questions = [
     type: "input",
     name: "email",
     message: "What is your email address?"
-  },
-  {
-    type: "input",
-    name: "URL",
-    message: "the URL of your project?"
   },
   {
     type: "input",
@@ -51,16 +46,41 @@ const questions = [
     name: "contributing",
     message: "How can a user contribute to the project?",
   }
-];
+])
+    .then(function (res) {
+        const queryURL = `https://api.github.com/users/${res.github}`;
+
+        axios.get(queryURL).then( function(res) {
+            const avatar = res.data.avatar_url;
+            const email = res.data.email;
 
 
+            `![avatar](${avatar});
 
-function writeToFile(fileName, data) {
-    
-}
 
-function init() {
+            ## ${res.title}![WordPress Theme Active Installs](https://img.shields.io/wordpress/theme/installs/twentysixteen)
+            ${res.title}
+            ## Table of contents
+            - [Installation](#Installation)
+            - [License](#License)
+            - [Contributing](#Contributing)
+            - [Test](#Test)
+            - [Contact](#Contact)
+            ## Installation
+            ${res.installation}
+            ## License
+            ${res.liscence}
+            ## Contributing
+            ${res.contributing}
+            ## Test
+            ${res.test}
+            ## Contact
+            <${email}>(mailto:${email})`
+  
+              fs.writeFile('REAMDE.md', md, function (err) {
+                  if (err) throw err
+                  console.log("Here's your REAMDE")
+              })
+          })
+    })
 
-}
-
-init();
